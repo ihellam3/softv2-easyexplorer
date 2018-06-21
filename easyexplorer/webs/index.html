@@ -8,7 +8,7 @@
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script type="text/javascript" src="https://unpkg.com/vue@2.2.1/dist/vue.min.js"></script>
   <script type="text/javascript" src="https://unpkg.com/vue-form-generator@2.1.1"></script>
-  <link rel="stylesheet" type="text/css" href="/apps/easyexplorer/main.css">
+  <link rel="stylesheet" type="text/css" href="/apps/easyexplorer/0.0.5/main.css">
   <link rel="stylesheet" type="text/css" href="https://unpkg.com/vue-form-generator@2.1.0/dist/vfg.css">
   <title>EasyExplorer</title>
 </head>
@@ -17,7 +17,6 @@
   <h1 class="text-center">EasyExplorer</h1>
   <div class="container" id="app">
     <div class="panel panel-default">
-      <div class="panel-heading">表单</div>
       <div class="panel-body">
         <vue-form-generator :schema="schema" :model="model" :options="formOptions"></vue-form-generator>
       </div>
@@ -85,7 +84,7 @@
               validateBeforeSubmit: true,
               onSubmit: function(mod, sch) {
                   var postData = {"enable":"0"};
-                axios.post('/cgi-bin/luci/easyexplorer', postData).then(function(result) {
+                axios.post('/cgi-bin/luci/apps/easyexplorer', postData).then(function(result) {
                   self.handleData(result.data.easyexplorer[0], true);
                 });
               }
@@ -101,13 +100,13 @@
         var self = this
 
         var tm = function() {
-            axios.get("/cgi-bin/luci/easyexplorer/status").then(function(result) {
+            axios.get("/cgi-bin/luci/apps/easyexplorer/status").then(function(result) {
                 self.model.status = result.data;
                 //setTimeout(tm, 3000);
             });
         };
 
-        axios.get("/cgi-bin/luci/easyexplorer").then(function(result) {
+        axios.get("/cgi-bin/luci/apps/easyexplorer").then(function(result) {
           self.handleData(result.data.easyexplorer[0]);
           setTimeout(tm, 3000);
         });
