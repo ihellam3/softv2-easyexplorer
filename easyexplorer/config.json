@@ -7,7 +7,7 @@
     "event_scripts":[
         {"installed":99},
         {"start":99},
-        {"stop":99},
+        {"stop":99}
     ],
     "supports": ["arm"]
 }
