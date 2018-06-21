@@ -83,11 +83,11 @@
               buttonText: "提交",
               validateBeforeSubmit: true,
               onSubmit: function(mod, sch) {
-                  var postData = {"enable":"0"};
-                axios.post('/cgi-bin/luci/apps/easyexplorer', postData).then(function(result) {
-                  self.handleData(result.data.easyexplorer[0], true);
-                });
-              }
+                  var postData = {"enabled":"0"};
+                  axios.post('/cgi-bin/luci/apps/easyexplorer', postData).then(function(result) {
+                    self.handleData(result.data, true);
+                    });
+                }
               }]
           },
           formOptions: {
@@ -100,15 +100,15 @@
         var self = this
 
         var tm = function() {
-            axios.get("/cgi-bin/luci/apps/easyexplorer/status").then(function(result) {
+            axios.get("/cgi-bin/luci/apps/easyexplorer").then(function(result) {
                 self.model.status = result.data;
                 //setTimeout(tm, 3000);
             });
         };
 
         axios.get("/cgi-bin/luci/apps/easyexplorer").then(function(result) {
-          self.handleData(result.data.easyexplorer[0]);
-          setTimeout(tm, 3000);
+            self.handleData(result.data);
+            setTimeout(tm, 3000);
         });
       },
       methods: {
