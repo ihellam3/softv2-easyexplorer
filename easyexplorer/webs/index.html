@@ -71,7 +71,18 @@
               featured: true,
               required: true,
               disabled: false,
-              placeholder: "input your token here",
+              placeholder: "请输入你的 Token",
+              validator: VueFormGenerator.validators.string
+            }, {
+              type: "input",
+              inputType: "text",
+              label: "Path",
+              model: "path",
+              readonly: false,
+              featured: true,
+              required: true,
+              disabled: false,
+              placeholder: "请输入你的共享路径",
               validator: VueFormGenerator.validators.string
             }, {
               type: "label",
@@ -83,9 +94,26 @@
               buttonText: "提交",
               validateBeforeSubmit: true,
               onSubmit: function(mod, sch) {
-                  var postData = {"enabled":"0"};
+                  var postData = {
+                     enabled: mod.enabled ? "1" : "0",
+                     token: mod.token,
+                     path: mod.path
+                  };
+
+                    var tm = function() {
+                        axios.get("/cgi-bin/luci/apps/easyexplorer").then(function(result) {
+                            var msg = ' status=未运行';
+                            if(result.data.status && result.data.status != "") {
+                                msg =' status=运行中 pid=' + result.data.status;
+                            }
+                            self.model.status = result.data.router_id + msg;
+                            self.model.status = result.data.router_id + msg;
+                        });
+                    };
+
                   axios.post('/cgi-bin/luci/apps/easyexplorer', postData).then(function(result) {
-                    self.handleData(result.data, true);
+                        self.handleData(result.data, true);
+                        setTimeout(tm, 3000);
                     });
                 }
               }]
@@ -101,7 +129,11 @@
 
         var tm = function() {
             axios.get("/cgi-bin/luci/apps/easyexplorer").then(function(result) {
-                self.model.status = result.data;
+                var msg = ' status=未运行';
+                if(result.data.status && result.data.status != "") {
+                    msg =' status=运行中 pid=' + result.data.status;
+                }
+                self.model.status = result.data.router_id + msg;
                 //setTimeout(tm, 3000);
             });
         };
@@ -115,18 +147,14 @@
         handleData: function (data, is_post) {
           data.enabled = (data.enabled === "1");
           data.token = data.token || '';
-          data.pusher_token = '';
-          data.status = {
-            'not-init': '未初始化',
-            'start': '运行中',
-            'stop': '停止运行'
-          }[data.status];
+          data.status = data.status || '';
+          data.path = data.path || '';
           if (is_post) {
             this.model.enabled = data.enabled;
             this.model.token = data.token;
             this.model.status = data.status;
+            this.model.path = data.path;
           } else {
-              console.log("data=", data);
             this.model = data;
           }
         }

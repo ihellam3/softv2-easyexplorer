@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 . /koolshare/scripts/base.sh
 . /koolshare/scripts/jshn.sh
@@ -13,10 +13,14 @@ on_get() {
     config_get easyexplorer_token main token
     config_get easyexplorer_path main path
 
-    status=`pidof easyexplorer`
-    router_id=`$APP_ROOT/easyexplorer -v`
+    if [ "$easyexplorer_token" == "none" -o "$easyexplorer_token"x == x ]; then
+        easyexplorer_token=`uci get luci.main.token`
+    fi
 
-    echo '{"status":"' ${status} '","router_id":"' $router_id '","token":"' $easyexplorer_token '","path":"' $path '","enabled":"' $easyexplorer_enabled '"}'
+    status=`pidof easyexplorer`
+    router_id=`$APP_ROOT/bin/easyexplorer -v`
+
+    echo '{"status":"'$status'","router_id":"'$router_id'","token":"'$easyexplorer_token'","path":"'$easyexplorer_path'","enabled":"'$easyexplorer_enabled'"}'
 }
 
 on_post() {
@@ -28,19 +32,19 @@ on_post() {
     json_get_var easyexplorer_enabled "enabled"
     json_get_var easyexplorer_token "token"
     json_get_var easyexplorer_path "path"
-    uci -q batch <<-EOT
-     set easyexplorer.enabled=$easyexplorer_enabled
-     set easyexplorer.token=$easyexplorer_token
-     set easyexporer.path=$easyexplorer_path
-    EOT
+    uci -q batch <<-EOF
+set easyexplorer.main.enabled=${easyexplorer_enabled}
+set easyexplorer.main.token=${easyexplorer_token}
+set easyexplorer.main.path=${easyexplorer_path}
+EOF
 
-    if [ "$easyexplorer_enabled"x = "1"x ]; then
+    if [ "$easyexplorer_enabled" = "1" ]; then
         killall easyexplorer > /dev/null 2>&1
-        start-stop-daemon -S -b -q -x $APP_ROOT/bin/easyexplorer -u $easyexplorer_token -share $easyexplorer_path -c /tmp/ee >/dev/null
+        start-stop-daemon -S -b -q -x $APP_ROOT/bin/easyexplorer -- -u $easyexplorer_token -share $easyexplorer_path -c /tmp/ee >/dev/null
 
         uci commit
         on_get
-    elif [ "$easyexplorer_enabled"x = "0"x ]; then
+    elif [ "$easyexplorer_enabled" = "0" ]; then
         killall easyexplorer > /dev/null 2>&1
 
         uci commit
@@ -60,7 +64,7 @@ on_start() {
     config_get easyexplorer_path main path
     if [ "$easyexplorer_enabled"x = "1"x ]; then
         killall easyexplorer > /dev/null 2>&1
-        start-stop-daemon -S -b -q -x $APP_ROOT/bin/easyexplorer -u $easyexplorer_token -share $easyexplorer_path -c /tmp/ee >/dev/null
+        start-stop-daemon -S -b -q -x $APP_ROOT/bin/easyexplorer -- -u $easyexplorer_token -share $easyexplorer_path -c /tmp/ee >/dev/null
     else
         killall easyexplorer > /dev/null 2>&1
     fi
@@ -93,3 +97,4 @@ stop)
     on_start
     ;;
 esac
+
