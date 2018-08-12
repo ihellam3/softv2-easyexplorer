@@ -1,4 +1,5 @@
 local nixio = require "nixio"
+local http = require "luci.http"
 local ksutil = require "luci.ksutil"
 
 module("luci.controller.apps.easyexplorer.index", package.seeall)
