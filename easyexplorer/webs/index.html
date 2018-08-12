@@ -73,6 +73,17 @@
               disabled: false,
               placeholder: "请输入你的 Token",
               validator: VueFormGenerator.validators.string
+            },{
+               type: "select",
+               label: "根目录参考",
+               model: "rootpath",
+               values: [],
+               selectOptions: {
+                   hideNoneSelectedText: true
+               },
+               onChanged: function(model, newVal, oldVal, field) {
+                   model.path = newVal;
+               }
             }, {
               type: "input",
               inputType: "text",
@@ -138,9 +149,23 @@
             });
         };
 
-        axios.get("/cgi-bin/luci/apps/easyexplorer").then(function(result) {
-            self.handleData(result.data);
-            setTimeout(tm, 3000);
+        axios.get("/cgi-bin/luci/apps/easyexplorer/mounts").then(function(result) {
+            var ds = ["/"];
+            var data = result.data;
+            for(i = 0; i < data.length; i++) {
+               if(data[i].mountpoint.startsWith("/tmp/")) {
+                    ds.push(data[i].mountpoint);
+               }
+            }
+            ds.sort();
+            self.schema.fields[2].values = ds;
+
+            axios.get("/cgi-bin/luci/apps/easyexplorer").then(function(result) {
+                result.data["rootpath"] = ds[0];
+                self.handleData(result.data);
+                setTimeout(tm, 3000);
+            });
+
         });
       },
       methods: {

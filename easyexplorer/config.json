@@ -1,7 +1,7 @@
 {
     "name":"easyexplorer",
     "displayName":"EasyExplorer",
-    "version":"0.0.5",
+    "version":"0.0.6",
     "tags":"官方 文件管理 下载",
     "description": "多设备，点对点文件管理工具",
     "event_scripts":[
