@@ -18,7 +18,7 @@ on_get() {
     fi
 
     status=`pidof easyexplorer`
-    router_id=`$APP_ROOT/bin/easyexplorer -v`
+    router_id=`$APP_ROOT/bin/easyexplorer -vv`
 
     echo '{"status":"'$status'","router_id":"'$router_id'","token":"'$easyexplorer_token'","path":"'$easyexplorer_path'","enabled":"'$easyexplorer_enabled'"}'
 }
